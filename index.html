@@ -35,7 +35,7 @@
       height: 100%;
       width: 100%;
       text-align: center;
-      font-size: 2rem;
+      font-size: 3rem; /* plus gros */
       color: white;
       background: rgba(0,0,0,0.4);
       transition: opacity 2s;
@@ -44,21 +44,28 @@
 
     .enigme {
       font-family: 'Brush Script MT', cursive;
-      font-size: 2rem;
-      margin-bottom: 20px;
+      font-size: 2.5rem;
+      margin-bottom: 30px;
     }
     input {
-      padding: 10px;
-      font-size: 1.2rem;
+      padding: 20px;
+      font-size: 1.8rem;
+      margin-bottom: 20px;
     }
     button {
-      padding: 10px 20px;
+      padding: 15px 30px;
       margin-left: 10px;
-      font-size: 1.2rem;
+      font-size: 1.8rem;
       cursor: pointer;
     }
 
-    /* Swipe container */
+    /* transition disparition */
+    .fade-out {
+      opacity: 0;
+      transition: opacity 5s ease;
+    }
+
+    /* Swiper container */
     .swiper {
       width: 100%;
       height: 100%;
@@ -66,11 +73,12 @@
     .swiper-slide {
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: center;   /* centrage vertical */
       align-items: center;
       text-align: center;
       color: white;
       background: rgba(0,0,0,0.4);
+      font-size: 2rem;
     }
   </style>
   <!-- Swiper.js -->
@@ -93,33 +101,38 @@
 
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
   <script>
-    // Liste des images de fond
-    const images = [
-      'image1.jpg', 'image2.jpg', 'image3.jpg'
-    ];
-
     const bgContainer = document.querySelector('.background');
-    images.forEach((src, i) => {
-      const img = document.createElement('img');
-      img.src = src;
-      if(i===0) img.classList.add('active');
-      bgContainer.appendChild(img);
-    });
 
-    let index = 0;
-    setInterval(() => {
-      const imgs = document.querySelectorAll('.background img');
-      imgs[index].classList.remove('active');
-      index = (index+1) % imgs.length;
-      imgs[index].classList.add('active');
-    }, 5000);
+    // Image unique accueil
+    const accueilImg = document.createElement('img');
+    accueilImg.src = 'main/images/accueil.jpg';
+    accueilImg.classList.add('active');
+    bgContainer.appendChild(accueilImg);
 
-    // Après 5s -> cacher l'accueil et afficher les énigmes
+    // Après 5s -> cacher accueil et afficher énigmes avec les autres backgrounds
     setTimeout(() => {
       document.getElementById('accueil').style.opacity = 0;
       setTimeout(() => {
         document.getElementById('accueil').classList.add('hidden');
         document.getElementById('enigmes').classList.remove('hidden');
+
+        // Charger les images a.jpg à w.jpg
+        const letters = 'abcdefghijklmnopqrstuvw';
+        letters.split('').forEach((letter, i) => {
+          const img = document.createElement('img');
+          img.src = `main/images/${letter}.jpg`;
+          bgContainer.appendChild(img);
+        });
+
+        // Démarrer slideshow
+        let index = 1; // commencer après accueil
+        const imgs = document.querySelectorAll('.background img');
+        setInterval(() => {
+          imgs.forEach((im) => im.classList.remove('active'));
+          imgs[index].classList.add('active');
+          index = (index + 1) % imgs.length;
+        }, 5000);
+
       }, 2000);
     }, 5000);
 
@@ -160,7 +173,7 @@
       const result = document.createElement('div');
       slide.appendChild(result);
 
-      // Vérifier si déjà répondu (localStorage)
+      // Vérifier si déjà répondu
       const saved = localStorage.getItem('enigme'+idx);
       if(saved){
         q.style.display = 'none';
@@ -172,10 +185,19 @@
       button.addEventListener('click', () => {
         if(input.value.trim().toLowerCase() === enigme.reponse.toLowerCase()){
           localStorage.setItem('enigme'+idx, input.value.trim());
-          q.style.display = 'none';
-          input.style.display = 'none';
-          button.style.display = 'none';
-          result.innerHTML = `La bonne réponse est bien<br><strong>${enigme.reponse}</strong>`;
+
+          // effet fondu long 5s
+          q.classList.add('fade-out');
+          input.classList.add('fade-out');
+          button.classList.add('fade-out');
+
+          setTimeout(() => {
+            q.style.display = 'none';
+            input.style.display = 'none';
+            button.style.display = 'none';
+            result.innerHTML = `La bonne réponse est bien<br><strong>${enigme.reponse}</strong>`;
+          }, 5000);
+
         } else {
           alert('Mauvaise réponse');
         }
@@ -184,7 +206,7 @@
       wrapper.appendChild(slide);
     });
 
-    // Initialisation du swiper (navigation verticale)
+    // Initialisation swiper
     const swiper = new Swiper('.swiper', {
       direction: 'vertical',
       pagination: { el: '.swiper-pagination', clickable: true },
