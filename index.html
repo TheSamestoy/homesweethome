@@ -30,12 +30,12 @@
     .page {
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: center;   /* centrage vertical */
       align-items: center;
       height: 100%;
       width: 100%;
       text-align: center;
-      font-size: 3rem; /* plus gros */
+      font-size: 3rem;
       color: white;
       background: rgba(0,0,0,0.4);
       transition: opacity 2s;
@@ -44,18 +44,19 @@
 
     .enigme {
       font-family: 'Brush Script MT', cursive;
-      font-size: 2.5rem;
+      font-size: 3rem;
       margin-bottom: 30px;
     }
     input {
-      padding: 20px;
-      font-size: 1.8rem;
+      padding: 25px;
+      font-size: 2rem;
       margin-bottom: 20px;
+      text-align: center;
     }
     button {
-      padding: 15px 30px;
+      padding: 20px 40px;
       margin-left: 10px;
-      font-size: 1.8rem;
+      font-size: 2rem;
       cursor: pointer;
     }
 
@@ -105,7 +106,7 @@
 
     // Image unique accueil
     const accueilImg = document.createElement('img');
-    accueilImg.src = 'main/images/accueil.jpg';
+    accueilImg.src = 'images/accueil.jpg';
     accueilImg.classList.add('active');
     bgContainer.appendChild(accueilImg);
 
@@ -118,9 +119,9 @@
 
         // Charger les images a.jpg à w.jpg
         const letters = 'abcdefghijklmnopqrstuvw';
-        letters.split('').forEach((letter, i) => {
+        letters.split('').forEach((letter) => {
           const img = document.createElement('img');
-          img.src = `main/images/${letter}.jpg`;
+          img.src = `images/${letter}.jpg`;
           bgContainer.appendChild(img);
         });
 
@@ -147,7 +148,7 @@
       { question: 'Blablabla7', reponse: 'Clé7' },
       { question: 'Blablabla8', reponse: 'Clé8' },
       { question: 'Blablabla9', reponse: 'Clé9' },
-      { question: 'Blablabla11', reponse: 'Clé10' }
+      { question: 'Blablabla10', reponse: 'Clé10' }
     ];
 
     const wrapper = document.getElementById('swiper-wrapper');
@@ -171,6 +172,8 @@
       slide.appendChild(button);
 
       const result = document.createElement('div');
+      result.style.fontSize = "2rem";
+      result.style.marginTop = "20px";
       slide.appendChild(result);
 
       // Vérifier si déjà répondu
