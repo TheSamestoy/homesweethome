@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Notre douce maison</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Cursive', serif;
+      overflow: hidden;
+    }
+    .background {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+    .background img {
+      position: absolute;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 3s ease-in-out;
+    }
+    .active { opacity: 1; }
+
+    .page {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      width: 100%;
+      text-align: center;
+      font-size: 2rem;
+      color: white;
+      background: rgba(0,0,0,0.4);
+      transition: opacity 2s;
+    }
+    .hidden { display: none; }
+
+    .enigme {
+      font-family: 'Brush Script MT', cursive;
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+    input {
+      padding: 10px;
+      font-size: 1.2rem;
+    }
+    button {
+      padding: 10px 20px;
+      margin-left: 10px;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    /* Swipe container */
+    .swiper {
+      width: 100%;
+      height: 100%;
+    }
+    .swiper-slide {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: white;
+      background: rgba(0,0,0,0.4);
+    }
+  </style>
+  <!-- Swiper.js -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+</head>
+<body>
+  <div class="background"></div>
+
+  <!-- Page d'accueil -->
+  <div id="accueil" class="page">
+    <h1>Notre douce maison</h1>
+  </div>
+
+  <!-- Conteneur swiper pour les énigmes -->
+  <div class="swiper hidden" id="enigmes">
+    <div class="swiper-wrapper" id="swiper-wrapper"></div>
+    <!-- Pagination -->
+    <div class="swiper-pagination"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script>
+    // Liste des images de fond
+    const images = [
+      'image1.jpg', 'image2.jpg', 'image3.jpg'
+    ];
+
+    const bgContainer = document.querySelector('.background');
+    images.forEach((src, i) => {
+      const img = document.createElement('img');
+      img.src = src;
+      if(i===0) img.classList.add('active');
+      bgContainer.appendChild(img);
+    });
+
+    let index = 0;
+    setInterval(() => {
+      const imgs = document.querySelectorAll('.background img');
+      imgs[index].classList.remove('active');
+      index = (index+1) % imgs.length;
+      imgs[index].classList.add('active');
+    }, 5000);
+
+    // Après 5s -> cacher l'accueil et afficher les énigmes
+    setTimeout(() => {
+      document.getElementById('accueil').style.opacity = 0;
+      setTimeout(() => {
+        document.getElementById('accueil').classList.add('hidden');
+        document.getElementById('enigmes').classList.remove('hidden');
+      }, 2000);
+    }, 5000);
+
+    // Liste des énigmes et réponses attendues
+    const data = [
+      { question: 'Blablabla1', reponse: 'Clé1' },
+      { question: 'Blablabla2', reponse: 'Clé2' },
+      { question: 'Blablabla3', reponse: 'Clé3' },
+      { question: 'Blablabla4', reponse: 'Clé4' },
+      { question: 'Blablabla5', reponse: 'Clé5' },
+      { question: 'Blablabla6', reponse: 'Clé6' },
+      { question: 'Blablabla7', reponse: 'Clé7' },
+      { question: 'Blablabla8', reponse: 'Clé8' },
+      { question: 'Blablabla9', reponse: 'Clé9' },
+      { question: 'Blablabla10', reponse: 'Clé10' }
+    ];
+
+    const wrapper = document.getElementById('swiper-wrapper');
+
+    data.forEach((enigme, idx) => {
+      const slide = document.createElement('div');
+      slide.classList.add('swiper-slide');
+
+      const q = document.createElement('div');
+      q.className = 'enigme';
+      q.innerText = enigme.question;
+      slide.appendChild(q);
+
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.id = 'input-'+idx;
+      slide.appendChild(input);
+
+      const button = document.createElement('button');
+      button.innerText = 'Valider';
+      slide.appendChild(button);
+
+      const result = document.createElement('div');
+      slide.appendChild(result);
+
+      // Vérifier si déjà répondu (localStorage)
+      const saved = localStorage.getItem('enigme'+idx);
+      if(saved){
+        q.style.display = 'none';
+        input.style.display = 'none';
+        button.style.display = 'none';
+        result.innerHTML = `La bonne réponse est bien<br><strong>${saved}</strong>`;
+      }
+
+      button.addEventListener('click', () => {
+        if(input.value.trim().toLowerCase() === enigme.reponse.toLowerCase()){
+          localStorage.setItem('enigme'+idx, input.value.trim());
+          q.style.display = 'none';
+          input.style.display = 'none';
+          button.style.display = 'none';
+          result.innerHTML = `La bonne réponse est bien<br><strong>${enigme.reponse}</strong>`;
+        } else {
+          alert('Mauvaise réponse');
+        }
+      });
+
+      wrapper.appendChild(slide);
+    });
+
+    // Initialisation du swiper (navigation verticale)
+    const swiper = new Swiper('.swiper', {
+      direction: 'vertical',
+      pagination: { el: '.swiper-pagination', clickable: true },
+      mousewheel: true,
+      keyboard: true
+    });
+  </script>
+</body>
+</html>
