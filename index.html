@@ -30,7 +30,7 @@
     .page {
       display: flex;
       flex-direction: column;
-      justify-content: center;   /* centrage vertical */
+      justify-content: center;
       align-items: center;
       height: 100%;
       width: 100%;
@@ -73,13 +73,20 @@
     }
     .swiper-slide {
       display: flex;
-      flex-direction: column;
       justify-content: center;   /* centrage vertical */
-      align-items: center;
+      align-items: center;       /* centrage horizontal */
       text-align: center;
       color: white;
       background: rgba(0,0,0,0.4);
       font-size: 2rem;
+    }
+    .swiper-slide > div {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;  /* important pour occuper toute la slide */
+      width: 100%;
     }
   </style>
   <!-- Swiper.js -->
@@ -142,7 +149,7 @@
       { question: 'Blablabla1', reponse: 'Clé1' },
       { question: 'Blablabla2', reponse: 'Clé2' },
       { question: 'Blablabla3', reponse: 'Clé3' },
-      { question: 'Blablabla41', reponse: 'Clé4' },
+      { question: 'Blablabla4', reponse: 'Clé4' },
       { question: 'Blablabla5', reponse: 'Clé5' },
       { question: 'Blablabla6', reponse: 'Clé6' },
       { question: 'Blablabla7', reponse: 'Clé7' },
@@ -157,24 +164,27 @@
       const slide = document.createElement('div');
       slide.classList.add('swiper-slide');
 
+      const content = document.createElement('div'); // conteneur centré
+      slide.appendChild(content);
+
       const q = document.createElement('div');
       q.className = 'enigme';
       q.innerText = enigme.question;
-      slide.appendChild(q);
+      content.appendChild(q);
 
       const input = document.createElement('input');
       input.type = 'text';
       input.id = 'input-'+idx;
-      slide.appendChild(input);
+      content.appendChild(input);
 
       const button = document.createElement('button');
       button.innerText = 'Valider';
-      slide.appendChild(button);
+      content.appendChild(button);
 
       const result = document.createElement('div');
       result.style.fontSize = "2rem";
       result.style.marginTop = "20px";
-      slide.appendChild(result);
+      content.appendChild(result);
 
       // Vérifier si déjà répondu
       const saved = localStorage.getItem('enigme'+idx);
