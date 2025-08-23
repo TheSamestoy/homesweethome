@@ -68,65 +68,58 @@
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
   <script>
     const bgContainer = document.querySelector('.background');
-    const baseURL = "https://thesamestoy.github.io/homesweethome/images/";
+
+    // === Images de test qui existent réellement pour éviter le fond noir ===
+    const slideshowImages = [
+      "https://picsum.photos/1920/1080?random=1",
+      "https://picsum.photos/1920/1080?random=2",
+      "https://picsum.photos/1920/1080?random=3"
+    ];
+
     const specialFourthURL = "https://thesamestoy.github.io/homesweethome/panneaux3.jpg";
-
-    const letters = "abcdefghijklmnopqrstuvw";
-    const slideshowImages = letters.split('').map(l => baseURL + l + ".jpg");
-
-    let slideshowInterval = null;
-    let swiper;
-    let finalCreated = false;
 
     let img1 = document.createElement('img');
     let img2 = document.createElement('img');
     bgContainer.appendChild(img1);
     bgContainer.appendChild(img2);
-    let currentIndex = 0;
+
+    let currentIndex = Math.floor(Math.random() * slideshowImages.length);
+    img1.src = slideshowImages[currentIndex];
+    img1.classList.add("active");
+
+    img1.style.transition = "opacity 3s ease-in-out";
+    img2.style.transition = "opacity 3s ease-in-out";
+
+    let slideshowInterval = setInterval(() => {
+      let nextIndex;
+      do { nextIndex = Math.floor(Math.random() * slideshowImages.length); }
+      while (nextIndex === currentIndex);
+      currentIndex = nextIndex;
+
+      img2.src = slideshowImages[currentIndex];
+      img2.style.opacity = 1;
+      img1.style.opacity = 0;
+
+      // Permuter les images pour le prochain cycle
+      const tmp = img1;
+      img1 = img2;
+      img2 = tmp;
+    }, 5000);
 
     function stopSlideshow() {
-      if (slideshowInterval) {
-        clearInterval(slideshowInterval);
-        slideshowInterval = null;
-      }
+      clearInterval(slideshowInterval);
+      slideshowInterval = null;
     }
-    function startSlideshow() {
-      if (!img1 || !img2 || slideshowImages.length === 0) return;
-      stopSlideshow();
-      if (!img1.src) {
-        currentIndex = Math.floor(Math.random() * slideshowImages.length);
-        img1.src = slideshowImages[currentIndex];
-        img1.classList.add("active");
-        img2.classList.remove("active");
-      }
-      slideshowInterval = setInterval(() => {
-        let nextIndex;
-        do { nextIndex = Math.floor(Math.random() * slideshowImages.length); }
-        while (nextIndex === currentIndex);
-        currentIndex = nextIndex;
 
-        img2.src = slideshowImages[currentIndex];
-        img2.classList.add("active");
-        img1.classList.remove("active");
-
-        const tmp = img1; img1 = img2; img2 = tmp;
-      }, 5000);
-    }
     function setStaticBackground(url) {
-      if (!img1 || !img2) return;
       stopSlideshow();
       img1.src = url;
       img2.src = url;
-      img1.classList.add("active");
-      img2.classList.remove("active");
+      img1.style.opacity = 1;
+      img2.style.opacity = 0;
     }
 
-    // === Correction clé : afficher immédiatement une image ===
-    currentIndex = Math.floor(Math.random() * slideshowImages.length);
-    img1.src = slideshowImages[currentIndex];
-    img1.classList.add("active");
-    startSlideshow();
-
+    // === Gestion accueil et enigmes ===
     setTimeout(() => {
       document.getElementById('accueil').style.opacity = 0;
       setTimeout(() => {
@@ -161,12 +154,14 @@
       }
       return true;
     }
+
     function createFinalSlideIfNeeded() {
       if (finalCreated) return;
       buildEnigme(finalEnigma, data.length, true);
       finalCreated = true;
       swiper.update();
     }
+
     function teleportToFinalWithFade() {
       const blackout = document.getElementById('blackout');
       blackout.style.opacity = 1;
@@ -177,6 +172,7 @@
         blackout.style.opacity = 0;
       }, 5000);
     }
+
     function maybeUnlockFinal(teleport = false) {
       if (!areAllSolvedFirst10()) return;
       createFinalSlideIfNeeded();
@@ -245,7 +241,8 @@
 
     data.forEach((enigme, idx) => buildEnigme(enigme, idx));
 
-    swiper = new Swiper('.swiper', {
+    let finalCreated = false;
+    let swiper = new Swiper('.swiper', {
       direction: 'vertical',
       pagination: { el: '.swiper-pagination', clickable: true },
       mousewheel: true,
@@ -257,7 +254,21 @@
       if (idx === 3) {
         setStaticBackground(specialFourthURL);
       } else if (!finalCreated) {
-        startSlideshow();
+        // relancer le slideshow
+        slideshowInterval = setInterval(() => {
+          let nextIndex;
+          do { nextIndex = Math.floor(Math.random() * slideshowImages.length); }
+          while (nextIndex === currentIndex);
+          currentIndex = nextIndex;
+
+          img2.src = slideshowImages[currentIndex];
+          img2.style.opacity = 1;
+          img1.style.opacity = 0;
+
+          const tmp = img1;
+          img1 = img2;
+          img2 = tmp;
+        }, 5000);
       }
     });
 
