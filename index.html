@@ -8,16 +8,19 @@
       margin: 0; padding: 0; height: 100%;
       font-family: 'Cursive', serif; overflow: hidden; background-color: black;
     }
+
     .background {
       position: fixed; top: 0; left: 0;
-      width: 100%; height: 100%; z-index: -1; overflow: hidden;
+      width: 100%; height: 100%; z-index: 0; overflow: hidden;
     }
     .background img {
       position: absolute; inset: 0;
       width: 100%; height: 100%;
       object-fit: cover; opacity: 0; transition: opacity 3s ease-in-out;
     }
-    .active { opacity: 1; }
+    .background img.active { opacity: 1; }
+
+    .page, .swiper-slide { position: relative; z-index: 1; }
 
     .page {
       display: flex; justify-content: center; align-items: center;
@@ -57,7 +60,7 @@
   <div id="blackout"></div>
 
   <div id="accueil" class="page">
-    <h1>Notre douce maison0123</h1>
+    <h1>Notre douce maison2345</h1>
   </div>
 
   <div class="swiper hidden" id="enigmes">
@@ -68,15 +71,11 @@
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
   <script>
     const bgContainer = document.querySelector('.background');
-
-    // === Images de test qui existent réellement pour éviter le fond noir ===
-    const slideshowImages = [
-      "https://picsum.photos/1920/1080?random=1",
-      "https://picsum.photos/1920/1080?random=2",
-      "https://picsum.photos/1920/1080?random=3"
-    ];
-
+    const baseURL = "https://thesamestoy.github.io/homesweethome/images/";
     const specialFourthURL = "https://thesamestoy.github.io/homesweethome/panneaux3.jpg";
+
+    const letters = "abcdefghijklmnopqrstuvw";
+    const slideshowImages = letters.split('').map(l => baseURL + l + ".jpg");
 
     let img1 = document.createElement('img');
     let img2 = document.createElement('img');
@@ -87,24 +86,24 @@
     img1.src = slideshowImages[currentIndex];
     img1.classList.add("active");
 
-    img1.style.transition = "opacity 3s ease-in-out";
-    img2.style.transition = "opacity 3s ease-in-out";
+    function startSlideshow() {
+      return setInterval(() => {
+        let nextIndex;
+        do { nextIndex = Math.floor(Math.random() * slideshowImages.length); }
+        while (nextIndex === currentIndex);
+        currentIndex = nextIndex;
 
-    let slideshowInterval = setInterval(() => {
-      let nextIndex;
-      do { nextIndex = Math.floor(Math.random() * slideshowImages.length); }
-      while (nextIndex === currentIndex);
-      currentIndex = nextIndex;
+        img2.src = slideshowImages[currentIndex];
+        img2.classList.add("active");
+        img1.classList.remove("active");
 
-      img2.src = slideshowImages[currentIndex];
-      img2.style.opacity = 1;
-      img1.style.opacity = 0;
+        const tmp = img1;
+        img1 = img2;
+        img2 = tmp;
+      }, 5000);
+    }
 
-      // Permuter les images pour le prochain cycle
-      const tmp = img1;
-      img1 = img2;
-      img2 = tmp;
-    }, 5000);
+    let slideshowInterval = startSlideshow();
 
     function stopSlideshow() {
       clearInterval(slideshowInterval);
@@ -115,11 +114,11 @@
       stopSlideshow();
       img1.src = url;
       img2.src = url;
-      img1.style.opacity = 1;
-      img2.style.opacity = 0;
+      img1.classList.add("active");
+      img2.classList.remove("active");
     }
 
-    // === Gestion accueil et enigmes ===
+    // Gestion accueil et enigmes
     setTimeout(() => {
       document.getElementById('accueil').style.opacity = 0;
       setTimeout(() => {
@@ -128,6 +127,7 @@
       }, 2000);
     }, 5000);
 
+    // --- Énigmes ---
     const data = [
       { question: "Sans être délice<br>je ne suis pas laid<br>retrouvez moi six fois<br>autour d'un café", reponse: 'Lait' },
       { question: "<span style='color:red; text-decoration: line-through;'>356</span> - 47 - 007 - 701<br>Nous sommes premiers<br>mais le dernier ne l'est pas<br>qui est-il ?", reponse: 'Zéro' },
@@ -179,7 +179,7 @@
       if (teleport) teleportToFinalWithFade();
     }
 
-    function buildEnigme(enigme, idx, isFinal = false) {
+    function buildEnigme(enigme, idx, isFinal=false) {
       const slide = document.createElement('div');
       slide.classList.add('swiper-slide');
       if (isFinal) slide.classList.add('final-slide');
@@ -228,9 +228,7 @@
             result.innerHTML = `La bonne réponse est bien<br><strong>${enigme.reponse}</strong>`;
           }, 5000);
 
-          setTimeout(() => {
-            maybeUnlockFinal(true);
-          }, 1000);
+          setTimeout(() => maybeUnlockFinal(true), 1000);
         } else {
           alert('Mauvaise réponse');
         }
@@ -254,27 +252,11 @@
       if (idx === 3) {
         setStaticBackground(specialFourthURL);
       } else if (!finalCreated) {
-        // relancer le slideshow
-        slideshowInterval = setInterval(() => {
-          let nextIndex;
-          do { nextIndex = Math.floor(Math.random() * slideshowImages.length); }
-          while (nextIndex === currentIndex);
-          currentIndex = nextIndex;
-
-          img2.src = slideshowImages[currentIndex];
-          img2.style.opacity = 1;
-          img1.style.opacity = 0;
-
-          const tmp = img1;
-          img1 = img2;
-          img2 = tmp;
-        }, 5000);
+        slideshowInterval = startSlideshow();
       }
     });
 
-    if (areAllSolvedFirst10()) {
-      createFinalSlideIfNeeded();
-    }
+    if (areAllSolvedFirst10()) createFinalSlideIfNeeded();
   </script>
 </body>
 </html>
