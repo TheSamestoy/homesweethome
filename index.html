@@ -29,7 +29,6 @@
 
     .page {
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100%;
@@ -59,22 +58,19 @@
       font-size: 2rem;
       cursor: pointer;
     }
-
-    /* transition disparition */
     .fade-out {
       opacity: 0;
       transition: opacity 5s ease;
     }
 
-    /* Swiper container */
     .swiper {
       width: 100%;
       height: 100%;
     }
     .swiper-slide {
       display: flex;
-      justify-content: center;   /* centrage horizontal */
-      align-items: center;       /* centrage vertical */
+      justify-content: center;
+      align-items: center;
       text-align: center;
       color: white;
       background: rgba(0,0,0,0.4);
@@ -85,11 +81,10 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: 100%;  
+      height: 100%;
       width: 100%;
     }
   </style>
-  <!-- Swiper.js -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 </head>
 <body>
@@ -113,22 +108,22 @@
 
     // Image accueil
     const accueilImg = document.createElement('img');
-    accueilImg.src = baseURL + "Accueil.jpg";   // Attention à la majuscule
+    accueilImg.src = baseURL + "Accueil.jpg";
     accueilImg.classList.add('active');
     bgContainer.appendChild(accueilImg);
 
-    // Liste des images a.jpg → w.jpg
+    // Images pour le slideshow des énigmes
     const letters = "abcdefghijklmnopqrstuvw";
     const images = letters.split('').map(l => baseURL + l + ".jpg");
 
-    // Après 5s -> cacher accueil et afficher énigmes avec slideshow
+    // Après 5s -> cacher accueil et afficher énigmes + slideshow
     setTimeout(() => {
       document.getElementById('accueil').style.opacity = 0;
       setTimeout(() => {
         document.getElementById('accueil').classList.add('hidden');
         document.getElementById('enigmes').classList.remove('hidden');
 
-        // Crée deux calques pour le fondu
+        // Création de deux calques pour le fondu
         let img1 = document.createElement('img');
         let img2 = document.createElement('img');
         bgContainer.appendChild(img1);
@@ -141,16 +136,15 @@
 
         setInterval(() => {
           let nextIndex;
-          do {
-            nextIndex = Math.floor(Math.random() * images.length);
-          } while (nextIndex === currentIndex); // éviter la même image
+          do { nextIndex = Math.floor(Math.random() * images.length); }
+          while (nextIndex === currentIndex);
           currentIndex = nextIndex;
 
           img2.src = images[currentIndex];
           img2.classList.add("active");
           img1.classList.remove("active");
 
-          // swap références
+          // Swap références
           const tmp = img1;
           img1 = img2;
           img2 = tmp;
@@ -161,11 +155,11 @@
 
     // Liste des énigmes
     const data = [
-      { question: 'Blablabla11', reponse: 'Clé11' },
+      { question: 'Blablabla1', reponse: 'Clé1' },
       { question: 'Blablabla2', reponse: 'Clé2' },
       { question: 'Blablabla3', reponse: 'Clé3' },
       { question: 'Blablabla4', reponse: 'Clé4' },
-      { question: 'Blablabla5', reponse: 'Clé51' },
+      { question: 'Blablabla5', reponse: 'Clé5' },
       { question: 'Blablabla6', reponse: 'Clé6' },
       { question: 'Blablabla7', reponse: 'Clé7' },
       { question: 'Blablabla8', reponse: 'Clé8' },
@@ -212,7 +206,6 @@
       button.addEventListener('click', () => {
         if(input.value.trim().toLowerCase() === enigme.reponse.toLowerCase()){
           localStorage.setItem('enigme'+idx, input.value.trim());
-
           q.classList.add('fade-out');
           input.classList.add('fade-out');
           button.classList.add('fade-out');
