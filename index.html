@@ -90,12 +90,10 @@
 <body>
   <div class="background"></div>
 
-  <!-- Page d'accueil -->
   <div id="accueil" class="page">
     <h1>Notre douce maison</h1>
   </div>
 
-  <!-- Conteneur swiper pour les énigmes -->
   <div class="swiper hidden" id="enigmes">
     <div class="swiper-wrapper" id="swiper-wrapper"></div>
     <div class="swiper-pagination"></div>
@@ -123,13 +121,11 @@
         document.getElementById('accueil').classList.add('hidden');
         document.getElementById('enigmes').classList.remove('hidden');
 
-        // Création de deux calques pour le fondu
         let img1 = document.createElement('img');
         let img2 = document.createElement('img');
         bgContainer.appendChild(img1);
         bgContainer.appendChild(img2);
 
-        // Première image aléatoire
         let currentIndex = Math.floor(Math.random() * images.length);
         img1.src = images[currentIndex];
         img1.classList.add("active");
@@ -144,7 +140,6 @@
           img2.classList.add("active");
           img1.classList.remove("active");
 
-          // Swap références
           const tmp = img1;
           img1 = img2;
           img2 = tmp;
@@ -153,17 +148,17 @@
       }, 2000);
     }, 5000);
 
-    // Liste des énigmes
+    // Liste des énigmes avec <br> pour les retours à la ligne
     const data = [
       { question: "Sans être délice<br>Je ne suis pas laid<br>Retrouvez moi six fois<br>Autour d'un café", reponse: 'Clé18' },
-      { question: 'Blablabla2', reponse: 'Clé2' },
-      { question: 'Blablabla3', reponse: 'Clé3' },
-      { question: 'Blablabla4', reponse: 'Clé4' },
-      { question: 'Blablabla5', reponse: 'Clé5' },
-      { question: 'Blablabla6', reponse: 'Clé6' },
-      { question: 'Blablabla7', reponse: 'Clé7' },
-      { question: 'Blablabla8', reponse: 'Clé8' },
-      { question: 'Blablabla9', reponse: 'Clé9' },
+      { question: "47 - 007 - 701<br>Nous sommes premiers<br>mais le dernier<br>ne l'est pas", reponse: 'Clé2' },
+      { question: "Blablabla3<br>Deuxième ligne", reponse: 'Clé3' },
+      { question: "Blablabla4<br>Deuxième ligne", reponse: 'Clé4' },
+      { question: "Blablabla5<br>Deuxième ligne", reponse: 'Clé5' },
+      { question: "Blablabla6<br>Deuxième ligne", reponse: 'Clé6' },
+      { question: "Blablabla7<br>Deuxième ligne", reponse: 'Clé7' },
+      { question: "Blablabla8<br>Deuxième ligne", reponse: 'Clé8' },
+      { question: "Blablabla9<br>Deuxième ligne", reponse: 'Clé9' },
       { question: "Nous sommes deux fleurs<br>Sans couleur<br>Regarde nous<br>De près, encore plus près<br>Et complète le 100%", reponse: 'DANGER' }
     ];
 
@@ -178,7 +173,7 @@
 
       const q = document.createElement('div');
       q.className = 'enigme';
-      q.innerText = enigme.question;
+      q.innerHTML = enigme.question;  // <-- innerHTML pour interpréter les <br>
       content.appendChild(q);
 
       const input = document.createElement('input');
@@ -224,7 +219,6 @@
       wrapper.appendChild(slide);
     });
 
-    // Initialisation swiper
     const swiper = new Swiper('.swiper', {
       direction: 'vertical',
       pagination: { el: '.swiper-pagination', clickable: true },
