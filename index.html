@@ -121,6 +121,18 @@
     // Images pour le slideshow
     const letters = "abcdefghijklmnopqrstuvw";
     const slideshowImages = letters.split('').map(l => baseURL + l + ".jpg");
+// --- DEBUG : tester le chargement de chaque image ---
+function testerImages(images) {
+  images.forEach(url => {
+    const img = new Image();
+    img.onload = () => console.log("✅ OK :", url);
+    img.onerror = () => console.error("❌ Introuvable :", url);
+    img.src = url;
+  });
+}
+
+// Lancer le test au démarrage
+testerImages(slideshowImages);
 
     // Après 5s -> cacher accueil et afficher énigmes
     setTimeout(() => {
