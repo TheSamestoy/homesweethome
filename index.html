@@ -42,10 +42,8 @@
       height: 100%; width: 100%;
     }
 
-    /* Slide finale = fond noir plein, pas d'images derrière */
     .final-slide { background: black !important; }
 
-    /* Écran noir de transition */
     #blackout {
       position: fixed; top:0; left:0; width:100%; height:100%;
       background:black; opacity:0; pointer-events:none;
@@ -59,7 +57,7 @@
   <div id="blackout"></div>
 
   <div id="accueil" class="page">
-    <h1>Notre douce maison4</h1>
+    <h1>Notre douce maison10</h1>
   </div>
 
   <div class="swiper hidden" id="enigmes">
@@ -69,30 +67,23 @@
 
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
   <script>
-    // === Config images ===
     const bgContainer = document.querySelector('.background');
     const baseURL = "https://thesamestoy.github.io/homesweethome/images/";
     const specialFourthURL = "https://thesamestoy.github.io/homesweethome/panneaux3.jpg";
 
-    // Liste pour le diaporama (a.jpg -> w.jpg)
     const letters = "abcdefghijklmnopqrstuvw";
     const slideshowImages = letters.split('').map(l => baseURL + l + ".jpg");
 
-    // === État global ===
-    let slideshowInterval = null; // contrôler le diaporama
-    let swiper;                   // l'instance Swiper
-    let finalCreated = false;     // éviter de créer 2 fois la finale
+    let slideshowInterval = null;
+    let swiper;
+    let finalCreated = false;
 
-    // Deux calques d'image pour le crossfade
     let img1 = document.createElement('img');
     let img2 = document.createElement('img');
-    let currentIndex = 0;
-
-    // Ajouter immédiatement les calques au DOM (pas d'Accueil.jpg)
     bgContainer.appendChild(img1);
     bgContainer.appendChild(img2);
+    let currentIndex = 0;
 
-    // Utilitaires diaporama
     function stopSlideshow() {
       if (slideshowInterval) {
         clearInterval(slideshowInterval);
@@ -102,7 +93,6 @@
     function startSlideshow() {
       if (!img1 || !img2 || slideshowImages.length === 0) return;
       stopSlideshow();
-      // si aucune image active, activer img1 sur l'index courant
       if (!img1.src) {
         currentIndex = Math.floor(Math.random() * slideshowImages.length);
         img1.src = slideshowImages[currentIndex];
@@ -131,13 +121,12 @@
       img2.classList.remove("active");
     }
 
-    // DÉMARRER LE FOND TOUT DE SUITE (plus de dépendance à Accueil.jpg)
+    // === Correction clé : afficher immédiatement une image ===
     currentIndex = Math.floor(Math.random() * slideshowImages.length);
     img1.src = slideshowImages[currentIndex];
     img1.classList.add("active");
     startSlideshow();
 
-    // Afficher les énigmes après l'écran d'accueil (mêmes timings que ton code)
     setTimeout(() => {
       document.getElementById('accueil').style.opacity = 0;
       setTimeout(() => {
@@ -146,12 +135,11 @@
       }, 2000);
     }, 5000);
 
-    // === Données des 10 énigmes ===
     const data = [
       { question: "Sans être délice<br>je ne suis pas laid<br>retrouvez moi six fois<br>autour d'un café", reponse: 'Lait' },
       { question: "<span style='color:red; text-decoration: line-through;'>356</span> - 47 - 007 - 701<br>Nous sommes premiers<br>mais le dernier ne l'est pas<br>qui est-il ?", reponse: 'Zéro' },
       { question: "Contre vents et marées<br>Et vos milles averses<br>Je suis l'inamovible guide<br>The silent partner", reponse: 'Phare' },
-      { question: "La première flèche indique l'entrée<br>Et la seconde ?", reponse: 'Thonier' }, // 4e énigme
+      { question: "La première flèche indique l'entrée<br>Et la seconde ?", reponse: 'Thonier' },
       { question: "Fuyez nemesis<br>résolvez le puzzle<br>H470-H485-H490-H580-H600<br>connait le chemin", reponse: 'Balance' },
       { question: "Exotique gardien<br>je veille au brin du jour<br>l'Enigma enfantin<br>27 lettres d'amour", reponse: 'Toucan' },
       { question: "Trouvez l'équation<br>et faites que s'illumine<br>non pas 3x<br> mais le chiffre solution", reponse: 'Set' },
@@ -160,7 +148,6 @@
       { question: "Nous sommes deux fleurs sans couleurs<br>regarde nous de près <br>d'encore plus près<br>et complète le 100%", reponse: 'Danger' }
     ];
 
-    // Énigme finale (créée seulement quand 10/10 sont résolues)
     const finalEnigma = {
       question: "PHARE<br>LAIT<br>ZERO<br>BALANCE<br>GERMANY<br>TOUCAN<br>THONIER<br>OISEAU<br>SET<br>DANGER<br>1 2 3 7 6 1 2 4 1 5",
       reponse: 'Parenthèse'
@@ -168,7 +155,6 @@
 
     const wrapper = document.getElementById('swiper-wrapper');
 
-    // Helpers progression
     function areAllSolvedFirst10() {
       for (let i = 0; i < data.length; i++) {
         if (!localStorage.getItem('enigme' + i)) return false;
@@ -183,12 +169,12 @@
     }
     function teleportToFinalWithFade() {
       const blackout = document.getElementById('blackout');
-      blackout.style.opacity = 1;                // fondu vers noir (5s)
+      blackout.style.opacity = 1;
       setTimeout(() => {
-        swiper.slideTo(data.length);             // aller à la finale (index = 10)
-        stopSlideshow();                         // couper le diaporama
-        bgContainer.innerHTML = "";              // retirer les <img> de fond (fond noir pur)
-        blackout.style.opacity = 0;              // réapparition (5s)
+        swiper.slideTo(data.length);
+        stopSlideshow();
+        bgContainer.innerHTML = "";
+        blackout.style.opacity = 0;
       }, 5000);
     }
     function maybeUnlockFinal(teleport = false) {
@@ -197,11 +183,10 @@
       if (teleport) teleportToFinalWithFade();
     }
 
-    // Construction d'une slide d'énigme
     function buildEnigme(enigme, idx, isFinal = false) {
       const slide = document.createElement('div');
       slide.classList.add('swiper-slide');
-      if (isFinal) slide.classList.add('final-slide'); // fond noir
+      if (isFinal) slide.classList.add('final-slide');
 
       const content = document.createElement('div');
       slide.appendChild(content);
@@ -247,7 +232,6 @@
             result.innerHTML = `La bonne réponse est bien<br><strong>${enigme.reponse}</strong>`;
           }, 5000);
 
-          // Si cette validation complète les 10/10 -> débloque et téléporte
           setTimeout(() => {
             maybeUnlockFinal(true);
           }, 1000);
@@ -259,10 +243,8 @@
       wrapper.appendChild(slide);
     }
 
-    // Générer les 10 premières énigmes
     data.forEach((enigme, idx) => buildEnigme(enigme, idx));
 
-    // Init Swiper
     swiper = new Swiper('.swiper', {
       direction: 'vertical',
       pagination: { el: '.swiper-pagination', clickable: true },
@@ -270,31 +252,18 @@
       keyboard: true
     });
 
-    // Fond figé pour la 4e énigme (index 3)
     swiper.on('slideChange', () => {
       const idx = swiper.activeIndex;
       if (idx === 3) {
-        setStaticBackground(specialFourthURL);   // figer sur panneaux3.jpg
+        setStaticBackground(specialFourthURL);
       } else if (!finalCreated) {
-        startSlideshow();                        // reprendre le diaporama (tant que la finale n'existe pas)
+        startSlideshow();
       }
     });
 
-    // Si le joueur revient avec 10/10 déjà résolues, générer la finale (sans téléport auto)
     if (areAllSolvedFirst10()) {
       createFinalSlideIfNeeded();
     }
-
-    // --- DEBUG optionnel : tester les images du diaporama dans la console ---
-    // function testerImages(images) {
-    //   images.forEach(url => {
-    //     const img = new Image();
-    //     img.onload = () => console.log("✅ OK :", url);
-    //     img.onerror = () => console.error("❌ Introuvable :", url);
-    //     img.src = url;
-    //   });
-    // }
-    // testerImages(slideshowImages);
   </script>
 </body>
 </html>
