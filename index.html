@@ -85,7 +85,12 @@
       width: 100%;
     }
 
-    /* Écran noir pour la transition */
+    /* Slide finale = fond noir */
+    .final-slide {
+      background: black !important;
+    }
+
+    /* Écran noir de transition */
     #blackout {
       position: fixed;
       top:0;left:0;
@@ -123,11 +128,11 @@
     accueilImg.classList.add('active');
     bgContainer.appendChild(accueilImg);
 
-    // Images pour le slideshow des énigmes
+    // Images pour le slideshow
     const letters = "abcdefghijklmnopqrstuvw";
     const images = letters.split('').map(l => baseURL + l + ".jpg");
 
-    // Après 5s -> cacher accueil et afficher énigmes + slideshow
+    // Après 5s -> cacher accueil et afficher énigmes
     setTimeout(() => {
       document.getElementById('accueil').style.opacity = 0;
       setTimeout(() => {
@@ -175,7 +180,7 @@
       { question: "Nous sommes deux fleurs sans couleurs<br>Regarde nous de près <br>d'encore plus près<br>Et complète le 100%", reponse: 'Danger' }
     ];
 
-    // Ajouter la 11ème énigme spéciale
+    // 11ème énigme spéciale (fond noir)
     const finalEnigma = { 
       question: "PHARE - 1<br>LAIT - 2<br>ZERO - 3<br>BALANCE - 7<br>GERMANY - 6<br>TOUCAN - 1<br>THONIER - 2<br>OISEAU - 4<br>SET - 1<br>DANGER - 5", 
       reponse: 'Parenthèse' 
@@ -187,6 +192,7 @@
     function buildEnigme(enigme, idx, isFinal=false) {
       const slide = document.createElement('div');
       slide.classList.add('swiper-slide');
+      if(isFinal) slide.classList.add('final-slide'); // fond noir
 
       const content = document.createElement('div');
       slide.appendChild(content);
@@ -232,12 +238,12 @@
             result.innerHTML = `La bonne réponse est bien<br><strong>${enigme.reponse}</strong>`;
           }, 5000);
 
-          // Si c'était la dernière des 10 -> lancer transition vers page finale
+          // Si c'était la dernière des 10 -> fondu vers la finale
           if(!isFinal && idx === data.length-1){
             setTimeout(() => {
               document.getElementById('blackout').style.opacity = 1;
               setTimeout(() => {
-                swiper.slideTo(data.length); // aller à l'énigme finale
+                swiper.slideTo(data.length); // aller à la finale
                 document.getElementById('blackout').style.opacity = 0;
               }, 5000);
             }, 1000);
@@ -254,7 +260,7 @@
     // Générer les 10 énigmes
     data.forEach((enigme, idx) => buildEnigme(enigme, idx));
 
-    // Générer la 11ème énigme (page noire finale)
+    // Générer la 11ème énigme (fond noir)
     buildEnigme(finalEnigma, data.length, true);
 
     const swiper = new Swiper('.swiper', {
