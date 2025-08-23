@@ -5,101 +5,50 @@
   <title>Notre douce maison</title>
   <style>
     body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      font-family: 'Cursive', serif;
-      overflow: hidden;
+      margin: 0; padding: 0; height: 100%;
+      font-family: 'Cursive', serif; overflow: hidden;
     }
     .background {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: -1;
-      overflow: hidden;
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%; z-index: -1; overflow: hidden;
     }
     .background img {
-      position: absolute;
-      width: 100%; height: 100%;
-      object-fit: cover;
-      opacity: 0;
-      transition: opacity 3s ease-in-out;
+      position: absolute; width: 100%; height: 100%;
+      object-fit: cover; opacity: 0; transition: opacity 3s ease-in-out;
     }
     .active { opacity: 1; }
 
     .page {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-      width: 100%;
-      text-align: center;
-      font-size: 3rem;
-      color: white;
-      background: rgba(0,0,0,0.4);
+      display: flex; justify-content: center; align-items: center;
+      height: 100%; width: 100%; text-align: center;
+      font-size: 3rem; color: white; background: rgba(0,0,0,0.4);
       transition: opacity 2s;
     }
     .hidden { display: none; }
 
-    .enigme {
-      font-family: 'Brush Script MT', cursive;
-      font-size: 3.5rem;
-      margin-bottom: 40px;
-    }
-    input {
-      padding: 25px;
-      font-size: 2rem;
-      margin-bottom: 30px;
-      text-align: center;
-    }
-    button {
-      padding: 20px 50px;
-      margin-left: 10px;
-      font-size: 2rem;
-      cursor: pointer;
-    }
-    .fade-out {
-      opacity: 0;
-      transition: opacity 5s ease;
-    }
+    .enigme { font-family: 'Brush Script MT', cursive; font-size: 3.5rem; margin-bottom: 40px; }
+    input { padding: 25px; font-size: 2rem; margin-bottom: 30px; text-align: center; }
+    button { padding: 20px 50px; margin-left: 10px; font-size: 2rem; cursor: pointer; }
+    .fade-out { opacity: 0; transition: opacity 5s ease; }
 
-    .swiper {
-      width: 100%;
-      height: 100%;
-    }
+    .swiper { width: 100%; height: 100%; }
     .swiper-slide {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      color: white;
-      background: rgba(0,0,0,0.4);
-      font-size: 2rem;
+      display: flex; justify-content: center; align-items: center;
+      text-align: center; color: white; background: rgba(0,0,0,0.4); font-size: 2rem;
     }
     .swiper-slide > div {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-      width: 100%;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      height: 100%; width: 100%;
     }
 
-    /* Slide finale = fond noir */
-    .final-slide {
-      background: black !important;
-    }
+    /* Slide finale = fond noir plein, pas d'images derrière */
+    .final-slide { background: black !important; }
 
     /* Écran noir de transition */
     #blackout {
-      position: fixed;
-      top:0;left:0;
-      width:100%;height:100%;
-      background:black;
-      opacity:0;
-      pointer-events:none;
-      transition: opacity 5s ease;
-      z-index: 9999;
+      position: fixed; top:0; left:0; width:100%; height:100%;
+      background:black; opacity:0; pointer-events:none;
+      transition: opacity 5s ease; z-index: 9999;
     }
   </style>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
@@ -121,6 +70,9 @@
   <script>
     const bgContainer = document.querySelector('.background');
     const baseURL = "https://thesamestoy.github.io/homesweethome/images/";
+    let slideshowInterval = null; // pour pouvoir arrêter le diaporama
+    let swiper;                   // déclaré ici pour être accessible partout
+    let finalCreated = false;     // éviter de créer 2 fois la finale
 
     // Image accueil
     const accueilImg = document.createElement('img');
@@ -148,7 +100,7 @@
         img1.src = images[currentIndex];
         img1.classList.add("active");
 
-        setInterval(() => {
+        slideshowInterval = setInterval(() => {
           let nextIndex;
           do { nextIndex = Math.floor(Math.random() * images.length); }
           while (nextIndex === currentIndex);
@@ -158,41 +110,75 @@
           img2.classList.add("active");
           img1.classList.remove("active");
 
-          const tmp = img1;
-          img1 = img2;
-          img2 = tmp;
+          const tmp = img1; img1 = img2; img2 = tmp;
         }, 5000);
 
       }, 2000);
     }, 5000);
 
-    // Liste des énigmes
+    // Liste des énigmes (10 premières)
     const data = [
-      { question: "Sans être délice<br>Je ne suis pas laid<br>Retrouvez moi six fois<br>Autour d'un café", reponse: 'Lait' },
-      { question: "<span style='color:red; text-decoration: line-through;'>356</span> - 47 - 007 - 701<br>Nous sommes premiers<br>mais le dernier<br>ne l'est pas", reponse: 'Zéro' },
+      { question: "Sans être délice<br>je ne suis pas laid<br>retrouvez moi six fois<br>autour d'un café", reponse: 'Lait' },
+      { question: "<span style='color:red; text-decoration: line-through;'>356</span> - 47 - 007 - 701<br>Nous sommes premiers<br>mais le dernier ne l'est pas<br>qui est-il ?", reponse: 'Zéro' },
       { question: "Contre vents et marées<br>Et vos milles averses<br>Je suis l'inamovible guide<br>The silent partner", reponse: 'Phare' },
       { question: "La première flèche indique l'entrée<br>Et la seconde ?", reponse: 'Thonier' },
-      { question: "Fuyez nemesis<br>Résolvez le puzzle<br>l'échelle de H470-H485-H490-H580-H600<br> mène au céleste secret", reponse: 'Balance' },
+      { question: "Fuyez nemesis<br>résolvez le puzzle<br>H470-H485-H490-H580-H600<br>connait le chemin", reponse: 'Balance' },
       { question: "Exotique gardien<br>je veille au brin du jour<br>l'Enigma enfantin<br>27 lettres d'amour", reponse: 'Toucan' },
       { question: "Trouvez l'équation<br>et faites que s'illumine<br>non pas 3x<br> mais le chiffre solution", reponse: 'Set' },
-      { question: "Pays de l'est<br>Parfois à l'WEST<br>Trouvez-moi au Sud Est<br>A 1,5 mètre.", reponse: 'Germany' },
-      { question: "Trouvez l'oeil venu du froid<br>Iris de métal<br>Regardez moi poser fièrement<br>En tout temps et toutes saison", reponse: 'Oiseau' },
-      { question: "Nous sommes deux fleurs sans couleurs<br>Regarde nous de près <br>d'encore plus près<br>Et complète le 100%", reponse: 'Danger' }
+      { question: "Pays de l'est<br>parfois à l'WEST<br>trouvez-moi au Sud-Est<br>à 1,5 mètre.", reponse: 'Germany' },
+      { question: "Trouvez l'oeil venu du froid<br>iris de métal<br>en son reflet il pose fièrement<br>En tout temps et toutes saisons", reponse: 'Oiseau' },
+      { question: "Nous sommes deux fleurs sans couleurs<br>regarde nous de près <br>d'encore plus près<br>et complète le 100%", reponse: 'Danger' }
     ];
 
-    // 11ème énigme spéciale (fond noir)
-    const finalEnigma = { 
-      question: "PHARE<br>LAIT<br>ZERO<br>BALANCE<br>GERMANY<br>TOUCAN<br>THONIER<br>OISEAU<br>SET<br>DANGER<br>1 2 3 7 6 1 2 4 1 5", 
-      reponse: 'Parenthèse' 
+    // Énigme finale (fond noir)
+    const finalEnigma = {
+      question: "PHARE<br>LAIT<br>ZERO<br>BALANCE<br>GERMANY<br>TOUCAN<br>THONIER<br>OISEAU<br>SET<br>DANGER<br>1 2 3 7 6 1 2 4 1 5",
+      reponse: 'Parenthèse'
     };
 
     const wrapper = document.getElementById('swiper-wrapper');
 
-    // Fonction qui construit une énigme
-    function buildEnigme(enigme, idx, isFinal=false) {
+    // Helpers de progression
+    function areAllSolvedFirst10() {
+      for (let i = 0; i < data.length; i++) {
+        if (!localStorage.getItem('enigme' + i)) return false;
+      }
+      return true;
+    }
+
+    function createFinalSlideIfNeeded() {
+      if (finalCreated) return;
+      // Construire la 11e énigme (index = data.length)
+      buildEnigme(finalEnigma, data.length, true);
+      finalCreated = true;
+      swiper.update();
+    }
+
+    function teleportToFinalWithFade() {
+      const blackout = document.getElementById('blackout');
+      blackout.style.opacity = 1;                 // fondu vers noir (5s)
+      setTimeout(() => {
+        // Aller à la finale
+        swiper.slideTo(data.length);
+        // Stopper et retirer les images d'arrière-plan
+        if (slideshowInterval) clearInterval(slideshowInterval);
+        bgContainer.innerHTML = "";
+        // Faire réapparaître la slide finale (fond noir) en 5s
+        blackout.style.opacity = 0;
+      }, 5000);
+    }
+
+    function maybeUnlockFinal(teleport = false) {
+      if (!areAllSolvedFirst10()) return;
+      createFinalSlideIfNeeded();
+      if (teleport) teleportToFinalWithFade();
+    }
+
+    // Construction d'une slide d'énigme
+    function buildEnigme(enigme, idx, isFinal = false) {
       const slide = document.createElement('div');
       slide.classList.add('swiper-slide');
-      if(isFinal) slide.classList.add('final-slide'); // fond noir
+      if (isFinal) slide.classList.add('final-slide'); // fond noir
 
       const content = document.createElement('div');
       slide.appendChild(content);
@@ -204,7 +190,7 @@
 
       const input = document.createElement('input');
       input.type = 'text';
-      input.id = 'input-'+idx;
+      input.id = 'input-' + idx;
       content.appendChild(input);
 
       const button = document.createElement('button');
@@ -216,8 +202,8 @@
       result.style.marginTop = "20px";
       content.appendChild(result);
 
-      const saved = localStorage.getItem('enigme'+idx);
-      if(saved){
+      const saved = localStorage.getItem('enigme' + idx);
+      if (saved) {
         q.style.display = 'none';
         input.style.display = 'none';
         button.style.display = 'none';
@@ -225,8 +211,8 @@
       }
 
       button.addEventListener('click', () => {
-        if(input.value.trim().toLowerCase() === enigme.reponse.toLowerCase()){
-          localStorage.setItem('enigme'+idx, input.value.trim());
+        if (input.value.trim().toLowerCase() === enigme.reponse.toLowerCase()) {
+          localStorage.setItem('enigme' + idx, input.value.trim());
           q.classList.add('fade-out');
           input.classList.add('fade-out');
           button.classList.add('fade-out');
@@ -238,16 +224,11 @@
             result.innerHTML = `La bonne réponse est bien<br><strong>${enigme.reponse}</strong>`;
           }, 5000);
 
-          // Si c'était la dernière des 10 -> fondu vers la finale
-          if(!isFinal && idx === data.length-1){
-            setTimeout(() => {
-              document.getElementById('blackout').style.opacity = 1;
-              setTimeout(() => {
-                swiper.slideTo(data.length); // aller à la finale
-                document.getElementById('blackout').style.opacity = 0;
-              }, 5000);
-            }, 1000);
-          }
+          // À chaque résolution, on vérifie si TOUT est résolu.
+          // Si c'était la dernière manquante, on débloque et on téléporte.
+          setTimeout(() => {
+            maybeUnlockFinal(true);
+          }, 1000);
 
         } else {
           alert('Mauvaise réponse');
@@ -257,18 +238,21 @@
       wrapper.appendChild(slide);
     }
 
-    // Générer les 10 énigmes
+    // Générer les 10 premières énigmes
     data.forEach((enigme, idx) => buildEnigme(enigme, idx));
 
-    // Générer la 11ème énigme (fond noir)
-    buildEnigme(finalEnigma, data.length, true);
-
-    const swiper = new Swiper('.swiper', {
+    // Init Swiper
+    swiper = new Swiper('.swiper', {
       direction: 'vertical',
       pagination: { el: '.swiper-pagination', clickable: true },
       mousewheel: true,
       keyboard: true
     });
+
+    // Si un joueur revient avec 10/10 déjà résolues, générer la finale (mais sans téléportation auto)
+    if (areAllSolvedFirst10()) {
+      createFinalSlideIfNeeded();
+    }
   </script>
 </body>
 </html>
