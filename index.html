@@ -44,17 +44,17 @@
 
     .enigme {
       font-family: 'Brush Script MT', cursive;
-      font-size: 3rem;
-      margin-bottom: 30px;
+      font-size: 3.5rem;  /* plus gros */
+      margin-bottom: 40px;
     }
     input {
       padding: 25px;
       font-size: 2rem;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
       text-align: center;
     }
     button {
-      padding: 20px 40px;
+      padding: 20px 50px;
       margin-left: 10px;
       font-size: 2rem;
       cursor: pointer;
@@ -73,8 +73,8 @@
     }
     .swiper-slide {
       display: flex;
-      justify-content: center;   /* centrage vertical */
-      align-items: center;       /* centrage horizontal */
+      justify-content: center;   /* centrage horizontal */
+      align-items: center;       /* centrage vertical */
       text-align: center;
       color: white;
       background: rgba(0,0,0,0.4);
@@ -83,9 +83,9 @@
     .swiper-slide > div {
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100%;  /* important pour occuper toute la slide */
+      justify-content: center;   /* centrage vertical */
+      align-items: center;       /* centrage horizontal */
+      height: 100%;  
       width: 100%;
     }
   </style>
@@ -113,7 +113,7 @@
 
     // Image unique accueil
     const accueilImg = document.createElement('img');
-    accueilImg.src = 'images/accueil.jpg';
+    accueilImg.src = './images/accueil.jpg';   // chemin relatif corrigé
     accueilImg.classList.add('active');
     bgContainer.appendChild(accueilImg);
 
@@ -128,7 +128,7 @@
         const letters = 'abcdefghijklmnopqrstuvw';
         letters.split('').forEach((letter) => {
           const img = document.createElement('img');
-          img.src = `images/${letter}.jpg`;
+          img.src = `./images/${letter}.jpg`;   // chemin relatif corrigé
           bgContainer.appendChild(img);
         });
 
@@ -149,7 +149,7 @@
       { question: 'Blablabla1', reponse: 'Clé1' },
       { question: 'Blablabla2', reponse: 'Clé2' },
       { question: 'Blablabla3', reponse: 'Clé3' },
-      { question: 'Blablabla42', reponse: 'Clé4' },
+      { question: 'Blablabla45', reponse: 'Clé4' },
       { question: 'Blablabla5', reponse: 'Clé5' },
       { question: 'Blablabla6', reponse: 'Clé6' },
       { question: 'Blablabla7', reponse: 'Clé7' },
