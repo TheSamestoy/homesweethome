@@ -44,7 +44,7 @@
 
     .enigme {
       font-family: 'Brush Script MT', cursive;
-      font-size: 3.5rem;  /* plus gros */
+      font-size: 3.5rem;
       margin-bottom: 40px;
     }
     input {
@@ -83,8 +83,8 @@
     .swiper-slide > div {
       display: flex;
       flex-direction: column;
-      justify-content: center;   /* centrage vertical */
-      align-items: center;       /* centrage horizontal */
+      justify-content: center;
+      align-items: center;
       height: 100%;  
       width: 100%;
     }
@@ -103,54 +103,69 @@
   <!-- Conteneur swiper pour les énigmes -->
   <div class="swiper hidden" id="enigmes">
     <div class="swiper-wrapper" id="swiper-wrapper"></div>
-    <!-- Pagination -->
     <div class="swiper-pagination"></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
   <script>
     const bgContainer = document.querySelector('.background');
+    const baseURL = "https://thesamestoy.github.io/homesweethome/images/";
 
-    // Image unique accueil
+    // Image accueil
     const accueilImg = document.createElement('img');
-    accueilImg.src = './images/accueil.jpg';   // chemin relatif corrigé
+    accueilImg.src = baseURL + "Accueil.jpg";   // Attention à la majuscule
     accueilImg.classList.add('active');
     bgContainer.appendChild(accueilImg);
 
-    // Après 5s -> cacher accueil et afficher énigmes avec les autres backgrounds
+    // Liste des images a.jpg → w.jpg
+    const letters = "abcdefghijklmnopqrstuvw";
+    const images = letters.split('').map(l => baseURL + l + ".jpg");
+
+    // Après 5s -> cacher accueil et afficher énigmes avec slideshow
     setTimeout(() => {
       document.getElementById('accueil').style.opacity = 0;
       setTimeout(() => {
         document.getElementById('accueil').classList.add('hidden');
         document.getElementById('enigmes').classList.remove('hidden');
 
-        // Charger les images a.jpg à w.jpg
-        const letters = 'abcdefghijklmnopqrstuvw';
-        letters.split('').forEach((letter) => {
-          const img = document.createElement('img');
-          img.src = `./images/${letter}.jpg`;   // chemin relatif corrigé
-          bgContainer.appendChild(img);
-        });
+        // Crée deux calques pour le fondu
+        let img1 = document.createElement('img');
+        let img2 = document.createElement('img');
+        bgContainer.appendChild(img1);
+        bgContainer.appendChild(img2);
 
-        // Démarrer slideshow
-        let index = 1; // commencer après accueil
-        const imgs = document.querySelectorAll('.background img');
+        // Première image aléatoire
+        let currentIndex = Math.floor(Math.random() * images.length);
+        img1.src = images[currentIndex];
+        img1.classList.add("active");
+
         setInterval(() => {
-          imgs.forEach((im) => im.classList.remove('active'));
-          imgs[index].classList.add('active');
-          index = (index + 1) % imgs.length;
+          let nextIndex;
+          do {
+            nextIndex = Math.floor(Math.random() * images.length);
+          } while (nextIndex === currentIndex); // éviter la même image
+          currentIndex = nextIndex;
+
+          img2.src = images[currentIndex];
+          img2.classList.add("active");
+          img1.classList.remove("active");
+
+          // swap références
+          const tmp = img1;
+          img1 = img2;
+          img2 = tmp;
         }, 5000);
 
       }, 2000);
     }, 5000);
 
-    // Liste des énigmes et réponses attendues
+    // Liste des énigmes
     const data = [
       { question: 'Blablabla1', reponse: 'Clé1' },
       { question: 'Blablabla2', reponse: 'Clé2' },
       { question: 'Blablabla3', reponse: 'Clé3' },
-      { question: 'Blablabla45', reponse: 'Clé4' },
-      { question: 'Blablabla5', reponse: 'Clé5' },
+      { question: 'Blablabla4', reponse: 'Clé4' },
+      { question: 'Blablabla5', reponse: 'Clé51' },
       { question: 'Blablabla6', reponse: 'Clé6' },
       { question: 'Blablabla7', reponse: 'Clé7' },
       { question: 'Blablabla8', reponse: 'Clé8' },
@@ -164,7 +179,7 @@
       const slide = document.createElement('div');
       slide.classList.add('swiper-slide');
 
-      const content = document.createElement('div'); // conteneur centré
+      const content = document.createElement('div');
       slide.appendChild(content);
 
       const q = document.createElement('div');
@@ -186,7 +201,6 @@
       result.style.marginTop = "20px";
       content.appendChild(result);
 
-      // Vérifier si déjà répondu
       const saved = localStorage.getItem('enigme'+idx);
       if(saved){
         q.style.display = 'none';
@@ -199,7 +213,6 @@
         if(input.value.trim().toLowerCase() === enigme.reponse.toLowerCase()){
           localStorage.setItem('enigme'+idx, input.value.trim());
 
-          // effet fondu long 5s
           q.classList.add('fade-out');
           input.classList.add('fade-out');
           button.classList.add('fade-out');
@@ -210,7 +223,6 @@
             button.style.display = 'none';
             result.innerHTML = `La bonne réponse est bien<br><strong>${enigme.reponse}</strong>`;
           }, 5000);
-
         } else {
           alert('Mauvaise réponse');
         }
