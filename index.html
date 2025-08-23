@@ -84,11 +84,24 @@
       height: 100%;
       width: 100%;
     }
+
+    /* Écran noir pour la transition */
+    #blackout {
+      position: fixed;
+      top:0;left:0;
+      width:100%;height:100%;
+      background:black;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity 5s ease;
+      z-index: 9999;
+    }
   </style>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 </head>
 <body>
   <div class="background"></div>
+  <div id="blackout"></div>
 
   <div id="accueil" class="page">
     <h1>Notre douce maison</h1>
@@ -148,7 +161,7 @@
       }, 2000);
     }, 5000);
 
-    // Liste des énigmes avec <br> pour les retours à la ligne
+    // Liste des énigmes
     const data = [
       { question: "Sans être délice<br>Je ne suis pas laid<br>Retrouvez moi six fois<br>Autour d'un café", reponse: 'Lait' },
       { question: "<span style='color:red; text-decoration: line-through;'>356</span> - 47 - 007 - 701<br>Nous sommes premiers<br>mais le dernier<br>ne l'est pas", reponse: 'Zéro' },
@@ -162,9 +175,16 @@
       { question: "Nous sommes deux fleurs sans couleurs<br>Regarde nous de près <br>d'encore plus près<br>Et complète le 100%", reponse: 'Danger' }
     ];
 
+    // Ajouter la 11ème énigme spéciale
+    const finalEnigma = { 
+      question: "La dernière clé<br>se cache discrète<br>Ouvre-moi<br>par une ...", 
+      reponse: 'Parenthèse' 
+    };
+
     const wrapper = document.getElementById('swiper-wrapper');
 
-    data.forEach((enigme, idx) => {
+    // Fonction qui construit une énigme
+    function buildEnigme(enigme, idx, isFinal=false) {
       const slide = document.createElement('div');
       slide.classList.add('swiper-slide');
 
@@ -173,7 +193,7 @@
 
       const q = document.createElement('div');
       q.className = 'enigme';
-      q.innerHTML = enigme.question;  // <-- innerHTML pour interpréter les <br>
+      q.innerHTML = enigme.question;
       content.appendChild(q);
 
       const input = document.createElement('input');
@@ -211,13 +231,31 @@
             button.style.display = 'none';
             result.innerHTML = `La bonne réponse est bien<br><strong>${enigme.reponse}</strong>`;
           }, 5000);
+
+          // Si c'était la dernière des 10 -> lancer transition vers page finale
+          if(!isFinal && idx === data.length-1){
+            setTimeout(() => {
+              document.getElementById('blackout').style.opacity = 1;
+              setTimeout(() => {
+                swiper.slideTo(data.length); // aller à l'énigme finale
+                document.getElementById('blackout').style.opacity = 0;
+              }, 5000);
+            }, 1000);
+          }
+
         } else {
           alert('Mauvaise réponse');
         }
       });
 
       wrapper.appendChild(slide);
-    });
+    }
+
+    // Générer les 10 énigmes
+    data.forEach((enigme, idx) => buildEnigme(enigme, idx));
+
+    // Générer la 11ème énigme (page noire finale)
+    buildEnigme(finalEnigma, data.length, true);
 
     const swiper = new Swiper('.swiper', {
       direction: 'vertical',
