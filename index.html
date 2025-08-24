@@ -247,12 +247,18 @@
       keyboard: true
     });
 
+    // --- ✅ Correction : persistance de l’image pour l’énigme 4 ---
     swiper.on('slideChange', () => {
       const idx = swiper.activeIndex;
+
       if (idx === 3) {
+        // On force l’image spéciale et on bloque le diaporama
         setStaticBackground(specialFourthURL);
-      } else if (!finalCreated) {
-        slideshowInterval = startSlideshow();
+      } else {
+        // Si on sort de l’énigme 4, on relance le diaporama
+        if (!slideshowInterval && !finalCreated) {
+          slideshowInterval = startSlideshow();
+        }
       }
     });
 
@@ -260,4 +266,3 @@
   </script>
 </body>
 </html>
-
