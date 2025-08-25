@@ -55,10 +55,10 @@
 
     /* ✅ Styles spécifiques pour la bonne réponse */
     .result-text {
-      font-size: 4rem;   /* deux fois plus gros qu'avant */
+      font-size: 4rem;
     }
     .solution {
-      font-size: 4rem;   /* solution aussi deux fois plus grosse */
+      font-size: 4rem;
       font-weight: bold;
     }
   </style>
@@ -219,7 +219,11 @@
         q.style.display = 'none';
         input.style.display = 'none';
         button.style.display = 'none';
-        result.innerHTML = `<div class="result-text">La bonne réponse est bien :</div><div class="solution">${saved}</div>`;
+        if (isFinal) {
+          result.innerHTML = `<div class="result-text">Bravo ! Vous avez trouvé la réponse finale :</div><div class="solution">${saved}</div>`;
+        } else {
+          result.innerHTML = `<div class="result-text">La bonne réponse est bien :</div><div class="solution">${saved}</div>`;
+        }
       }
 
       button.addEventListener('click', () => {
@@ -233,7 +237,11 @@
             q.style.display = 'none';
             input.style.display = 'none';
             button.style.display = 'none';
-            result.innerHTML = `<div class="result-text">La bonne réponse est bien :</div><div class="solution">${enigme.reponse}</div>`;
+            if (isFinal) {
+              result.innerHTML = `<div class="result-text">Bravo ! Vous avez trouvé la réponse finale :</div><div class="solution">${enigme.reponse}</div>`;
+            } else {
+              result.innerHTML = `<div class="result-text">La bonne réponse est bien :</div><div class="solution">${enigme.reponse}</div>`;
+            }
           }, 5000);
 
           setTimeout(() => maybeUnlockFinal(true), 1000);
@@ -260,10 +268,8 @@
       const idx = swiper.activeIndex;
 
       if (idx === 3) {
-        // On force l’image spéciale et on bloque le diaporama
         setStaticBackground(specialFourthURL);
       } else {
-        // Si on sort de l’énigme 4, on relance le diaporama
         if (!slideshowInterval && !finalCreated) {
           slideshowInterval = startSlideshow();
         }
