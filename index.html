@@ -68,7 +68,7 @@
   <div id="blackout"></div>
 
   <div id="accueil" class="page">
-    <h1>Notre douce maison5</h1>
+    <h1>Notre douce maison6</h1>
   </div>
 
   <div class="swiper hidden" id="enigmes">
@@ -288,7 +288,12 @@
             result.innerHTML = `<div class="result-text">La bonne réponse est bien :</div><div class="solution">${enigme.reponse}</div>`;
           }, 5000);
 
-          setTimeout(() => maybeUnlockFinal(true), 1000);
+          setTimeout(() => {
+  if (!isFinal) {
+    maybeUnlockFinal(true);
+  }
+}, 1000);
+
         } else {
           alert('Mauvaise réponse');
         }
