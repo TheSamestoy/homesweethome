@@ -53,11 +53,12 @@
       transition: opacity 5s ease; z-index: 9999;
     }
 
+    /* ✅ Styles spécifiques pour la bonne réponse */
     .result-text {
-      font-size: 4rem;
+      font-size: 4rem;   /* deux fois plus gros qu'avant */
     }
     .solution {
-      font-size: 4rem;
+      font-size: 4rem;   /* solution aussi deux fois plus grosse */
       font-weight: bold;
     }
   </style>
@@ -68,7 +69,7 @@
   <div id="blackout"></div>
 
   <div id="accueil" class="page">
-    <h1>Notre douce maison6</h1>
+    <h1>Notre douce maison1</h1>
   </div>
 
   <div class="swiper hidden" id="enigmes">
@@ -80,14 +81,10 @@
   <script>
     const bgContainer = document.querySelector('.background');
     const baseURL = "https://thesamestoy.github.io/homesweethome/images/";
-    const finalBaseURL = "https://thesamestoy.github.io/homesweethome/imagesfin/";
     const specialFourthURL = "https://thesamestoy.github.io/homesweethome/panneaux3.jpg";
 
     const letters = "abcdefghijklmnopqrstuvw";
     const slideshowImages = letters.split('').map(l => baseURL + l + ".jpg");
-
-    const finalLetters = "abcdef";
-    const finalImages = finalLetters.split('').map(l => finalBaseURL + l + ".jpg");
 
     let img1 = document.createElement('img');
     let img2 = document.createElement('img');
@@ -98,14 +95,14 @@
     img1.src = slideshowImages[currentIndex];
     img1.classList.add("active");
 
-    function startSlideshow(images) {
+    function startSlideshow() {
       return setInterval(() => {
         let nextIndex;
-        do { nextIndex = Math.floor(Math.random() * images.length); }
+        do { nextIndex = Math.floor(Math.random() * slideshowImages.length); }
         while (nextIndex === currentIndex);
         currentIndex = nextIndex;
 
-        img2.src = images[currentIndex];
+        img2.src = slideshowImages[currentIndex];
         img2.classList.add("active");
         img1.classList.remove("active");
 
@@ -115,7 +112,7 @@
       }, 5000);
     }
 
-    let slideshowInterval = startSlideshow(slideshowImages);
+    let slideshowInterval = startSlideshow();
 
     function stopSlideshow() {
       clearInterval(slideshowInterval);
@@ -130,47 +127,7 @@
       img2.classList.remove("active");
     }
 
-    function startFinalSlideshow() {
-      stopSlideshow();
-      bgContainer.innerHTML = "";
-      img1 = document.createElement('img');
-      img2 = document.createElement('img');
-      bgContainer.appendChild(img1);
-      bgContainer.appendChild(img2);
-
-      currentIndex = Math.floor(Math.random() * finalImages.length);
-      img1.src = finalImages[currentIndex];
-      img1.classList.add("active");
-
-      slideshowInterval = startSlideshow(finalImages);
-    }
-
-    function showFinalPage() {
-      const swiperContainer = document.querySelector('.swiper');
-      swiperContainer.classList.add('hidden');
-
-      const finalPage = document.createElement('div');
-      finalPage.className = "page";
-      finalPage.style.flexDirection = "column";
-      finalPage.style.fontSize = "2rem";
-      finalPage.style.padding = "50px";
-      finalPage.style.background = "rgba(0,0,0,0.5)";
-      finalPage.style.lineHeight = "1.6";
-
-      finalPage.innerHTML = `
-        <p>Quelles sont les 17 montagnes du pays basque qui forment une parenthèse ?<br>
-        <em>Non c’est une blague.</em></p>
-        <p>Vous avez bien résolu toutes les énigmes, et avez une fois de plus démontré votre talent.</p>
-        <p>Votre modeste récompense vous attend dans le frigo.</p>
-        <p>Nous tenions à vous remercier pour ces quelques jours dans votre douce maison,<br>
-        Qui furent pour nous une délicieuse parenthèse.</p>
-        <p><strong>Merci d’avoir joué à mon jeu.</strong></p>
-      `;
-
-      document.body.appendChild(finalPage);
-      startFinalSlideshow();
-    }
-
+    // Gestion accueil et enigmes
     setTimeout(() => {
       document.getElementById('accueil').style.opacity = 0;
       setTimeout(() => {
@@ -179,6 +136,7 @@
       }, 2000);
     }, 5000);
 
+    // --- Énigmes ---
     const data = [
       { question: "Sans être délice<br>je ne suis pas laid.<br>Retrouvez moi six fois<br>autour d'un café", reponse: 'Lait' },
       { question: "<span style='color:red; text-decoration: line-through;'>356</span> - 47 - 007 - 701<br>Nous sommes premiers<br>mais le dernier ne l'est pas<br>qui est-il ?", reponse: 'Zéro' },
@@ -258,10 +216,6 @@
 
       const saved = localStorage.getItem('enigme' + idx);
       if (saved) {
-        if (isFinal) {
-          showFinalPage();
-          return;
-        }
         q.style.display = 'none';
         input.style.display = 'none';
         button.style.display = 'none';
@@ -271,12 +225,6 @@
       button.addEventListener('click', () => {
         if (input.value.trim().toLowerCase() === enigme.reponse.toLowerCase()) {
           localStorage.setItem('enigme' + idx, input.value.trim());
-
-          if (isFinal) {
-            showFinalPage();
-            return;
-          }
-
           q.classList.add('fade-out');
           input.classList.add('fade-out');
           button.classList.add('fade-out');
@@ -288,12 +236,7 @@
             result.innerHTML = `<div class="result-text">La bonne réponse est bien :</div><div class="solution">${enigme.reponse}</div>`;
           }, 5000);
 
-          setTimeout(() => {
-  if (!isFinal) {
-    maybeUnlockFinal(true);
-  }
-}, 1000);
-
+          setTimeout(() => maybeUnlockFinal(true), 1000);
         } else {
           alert('Mauvaise réponse');
         }
@@ -312,13 +255,17 @@
       keyboard: true
     });
 
+    // --- ✅ Correction : persistance de l’image pour l’énigme 4 ---
     swiper.on('slideChange', () => {
       const idx = swiper.activeIndex;
+
       if (idx === 3) {
+        // On force l’image spéciale et on bloque le diaporama
         setStaticBackground(specialFourthURL);
       } else {
+        // Si on sort de l’énigme 4, on relance le diaporama
         if (!slideshowInterval && !finalCreated) {
-          slideshowInterval = startSlideshow(slideshowImages);
+          slideshowInterval = startSlideshow();
         }
       }
     });
