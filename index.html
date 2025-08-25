@@ -69,7 +69,7 @@
   <div id="blackout"></div>
 
   <div id="accueil" class="page">
-    <h1>Notre douce maison2</h1>
+    <h1>Notre douce maison</h1>
   </div>
 
   <div class="swiper hidden" id="enigmes">
@@ -81,10 +81,15 @@
   <script>
     const bgContainer = document.querySelector('.background');
     const baseURL = "https://thesamestoy.github.io/homesweethome/images/";
+    const finalBaseURL = "https://thesamestoy.github.io/homesweethome/imagesfin/"; // ✅ dossier pour la page de fin
     const specialFourthURL = "https://thesamestoy.github.io/homesweethome/panneaux3.jpg";
 
     const letters = "abcdefghijklmnopqrstuvw";
     const slideshowImages = letters.split('').map(l => baseURL + l + ".jpg");
+
+    // --- images de fin ---
+    const finalLetters = "abcdef"; // adapte selon le nombre d’images disponibles
+    const finalImages = finalLetters.split('').map(l => finalBaseURL + l + ".jpg");
 
     let img1 = document.createElement('img');
     let img2 = document.createElement('img');
@@ -95,14 +100,14 @@
     img1.src = slideshowImages[currentIndex];
     img1.classList.add("active");
 
-    function startSlideshow() {
+    function startSlideshow(images) {
       return setInterval(() => {
         let nextIndex;
-        do { nextIndex = Math.floor(Math.random() * slideshowImages.length); }
+        do { nextIndex = Math.floor(Math.random() * images.length); }
         while (nextIndex === currentIndex);
         currentIndex = nextIndex;
 
-        img2.src = slideshowImages[currentIndex];
+        img2.src = images[currentIndex];
         img2.classList.add("active");
         img1.classList.remove("active");
 
@@ -112,7 +117,7 @@
       }, 5000);
     }
 
-    let slideshowInterval = startSlideshow();
+    let slideshowInterval = startSlideshow(slideshowImages);
 
     function stopSlideshow() {
       clearInterval(slideshowInterval);
@@ -125,6 +130,51 @@
       img2.src = url;
       img1.classList.add("active");
       img2.classList.remove("active");
+    }
+
+    // --- Fonction pour lancer le diaporama final ---
+    function startFinalSlideshow() {
+      stopSlideshow();
+      bgContainer.innerHTML = "";
+      img1 = document.createElement('img');
+      img2 = document.createElement('img');
+      bgContainer.appendChild(img1);
+      bgContainer.appendChild(img2);
+
+      currentIndex = Math.floor(Math.random() * finalImages.length);
+      img1.src = finalImages[currentIndex];
+      img1.classList.add("active");
+
+      slideshowInterval = startSlideshow(finalImages);
+    }
+
+    // --- Fonction pour afficher la page de fin ---
+    function showFinalPage() {
+      const swiperContainer = document.querySelector('.swiper');
+      swiperContainer.classList.add('hidden'); // on cache les énigmes
+
+      const finalPage = document.createElement('div');
+      finalPage.className = "page";
+      finalPage.style.flexDirection = "column";
+      finalPage.style.fontSize = "2rem";
+      finalPage.style.padding = "50px";
+      finalPage.style.background = "rgba(0,0,0,0.5)";
+      finalPage.style.lineHeight = "1.6";
+
+      finalPage.innerHTML = `
+        <p>Quelles sont les 17 montagnes du pays basque qui forment une parenthèse ?<br>
+        <em>Non c’est une blague.</em></p>
+        <p>Vous avez bien résolu toutes les énigmes, et avez une fois de plus démontré votre talent.</p>
+        <p>Votre modeste récompense vous attend dans le frigo.</p>
+        <p>Nous tenions à vous remercier pour ces quelques jours dans votre douce maison,<br>
+        Qui furent pour nous une délicieuse parenthèse.</p>
+        <p><strong>Merci d’avoir joué à mon jeu.</strong></p>
+      `;
+
+      document.body.appendChild(finalPage);
+
+      // ✅ lancer le nouveau diaporama
+      startFinalSlideshow();
     }
 
     // Gestion accueil et enigmes
@@ -220,6 +270,7 @@
         input.style.display = 'none';
         button.style.display = 'none';
         result.innerHTML = `<div class="result-text">La bonne réponse est bien :</div><div class="solution">${saved}</div>`;
+        if (isFinal) showFinalPage(); // si déjà résolue
       }
 
       button.addEventListener('click', () => {
@@ -234,6 +285,11 @@
             input.style.display = 'none';
             button.style.display = 'none';
             result.innerHTML = `<div class="result-text">La bonne réponse est bien :</div><div class="solution">${enigme.reponse}</div>`;
+
+            // ✅ si c’est la dernière énigme, afficher la page de fin
+            if (isFinal) {
+              setTimeout(showFinalPage, 3000);
+            }
           }, 5000);
 
           setTimeout(() => maybeUnlockFinal(true), 1000);
@@ -260,12 +316,10 @@
       const idx = swiper.activeIndex;
 
       if (idx === 3) {
-        // On force l’image spéciale et on bloque le diaporama
         setStaticBackground(specialFourthURL);
       } else {
-        // Si on sort de l’énigme 4, on relance le diaporama
         if (!slideshowInterval && !finalCreated) {
-          slideshowInterval = startSlideshow();
+          slideshowInterval = startSlideshow(slideshowImages);
         }
       }
     });
